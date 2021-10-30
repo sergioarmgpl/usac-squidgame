@@ -66,7 +66,7 @@ metadata:
   namespace: squidgame
 spec: 
   rules: 
-  - host: 34.132.113.145.nip.io
+  - host: 35.224.176.158.nip.io
     http: 
       paths: 
       - path: /myapp
@@ -146,6 +146,6 @@ spec:
   service: myapp
   backends:
   - service: myapp
-    weight: 900m
-  - service: error-injector
-    weight: 100m
+    weight: 1000m
+#  - service: error-injector
+#    weight: 300m

@@ -9,6 +9,11 @@ sudo apt-get update && sudo apt-get install google-cloud-sdk
 gcloud init
 ```  
 
+## Create cluster
+```
+gcloud container clusters create k8s-demo --num-nodes=1 --tags=allin,allout --machine-type=n1-standard-2 --no-enable-network-policy
+```
+
 ## Installing helm
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
@@ -52,11 +57,9 @@ sudo usermod -aG docker developer
 ## Install Linkerd
 ```
 curl -fsL https://run.linkerd.io/install | sh
-linkerd install | kubectl apply -f -
 nano ~/.bashrc <- export PATH=$PATH:/home/YOUR_USER/.linkerd2/bin
 
 linkerd install | kubectl apply -f -
-linkerd viz install | kubectl apply -f -
 linkerd check
 linkerd viz install | kubectl apply -f -
 linkerd check
@@ -77,8 +80,19 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 kubectl get deployment nginx-ingress-ingress-nginx-controller -n nginx-ingress  -o yaml | linkerd inject - | kubectl apply -f -
 ```
+Check if you can find 2 pods for the NGINX ingress-controller
+```
+kubectl get pods -n nginx-ingress
+```
+
+## Get Load Balancer IP
+```
+kubectl get svc -n nginx-ingress
+```
+
 
 ## Create the project
+*Note:* You have to change the IP in the ingress definition
 ```
 kubectl  apply -f squidgame.yaml 
 kubectl delete -f squidgame.yaml 
@@ -88,4 +102,19 @@ kubectl delete -f squidgame.yaml
 ```
 export LOADBALANCER_IP=X.X.X.X
 for i in {0..100000}; do  curl http://${LOADBALANCER_IP}.nip.io/myapp; done
+```
+
+## Chaos Mesh Installation
+```
+curl -sSL https://mirrors.chaos-mesh.org/v2.0.3/install.sh | bash
+```
+Opening the dashboard
+```
+kubectl port-forward -n chaos-testing svc/chaos-dashboard 2333:2333
+```
+```
+kubectl apply -f chaos_mesh/pod-experiments.yaml
+```
+```
+kubectl get pods -n squidgame -w
 ```
